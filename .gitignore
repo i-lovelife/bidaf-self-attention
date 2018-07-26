@@ -1,0 +1,9 @@
+*.pyc
+*.DS_Store
+*~
+data/
+*.tar.gz
+*.egg-info
+*.swp
+myenv/
+*/.ipynb_checkpoints/
