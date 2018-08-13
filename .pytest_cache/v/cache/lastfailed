@@ -8,5 +8,6 @@
   "tests/bidaf_test.py::BidirectionalAttentionFlowTest::test_forward_pass_runs_correctly": true,
   "tests/bidaf_test.py::BidirectionalAttentionFlowTest::test_get_best_span": true,
   "tests/bidaf_test.py::BidirectionalAttentionFlowTest::test_mismatching_dimensions_throws_configuration_error": true,
-  "tests/bidaf_test.py::BidirectionalAttentionFlowTest::test_model_can_train_save_and_load": true
+  "tests/bidaf_test.py::BidirectionalAttentionFlowTest::test_model_can_train_save_and_load": true,
+  "tests/bidaf_v2_test.py::BidafV2SquadV2Test::test_get_best_span": true
 }

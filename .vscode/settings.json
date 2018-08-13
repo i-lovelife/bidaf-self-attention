@@ -1,14 +1,35 @@
 {
-    "files.exclude": {
-        "**/.git": true,
-        "**/.svn": true,
-        "**/.hg": true,
-        "**/CVS": true,
-        "**/.DS_Store": true,
-        "**/myenv/**": true
-    },
     "python.pythonPath": "${workspaceFolder}/myenv/bin/python",
+    "files.exclude": {
+        "**/.pytest_cache/**": true,
+        "**/__pycache__/**": true,
+        "**/myenv/**": true,
+        "**/.mypy_cache/**": true,
+        "**/.ipynb_checkpoints/**": true
+    },
+    "files.watcherExclude": {
+        "**/.git/objects/**": true,
+        "**/.git/subtree-cache/**": true,
+        "**/node_modules/**": true,
+        "**/myenv/**": true,
+        "**/.mypy_cache/**": true,
+        "**/.ipynb_checkpoints/**": true
+    },
+    "python.autoComplete.extraPaths": ["${workspaceFolder}"],
+    "python.autoComplete.preloadModules": ["torch"],
+    "python.linting.enabled": true,
+    "python.linting.pylintEnabled": true,
     "python.linting.flake8Enabled": false,
-    "python.linting.enabled": false,
-    "python.linting.pylintEnabled": false
+    "python.linting.mypyEnabled": true,
+    "python.linting.flake8Args": [
+        "--max-line-length=256"
+    ],
+    "python.linting.mypyArgs": [
+        "--ignore-missing-imports",
+        "--follow-imports=silent"
+    ],
+    "python.linting.pylintArgs": ["-d locally-disabled,locally-enabled"],
+    "python.jediEnabled": false,
+    "jsonnet.executablePath": "/home/lnan6257/.local/bin/jsonnet",
+    "jsonnet.outputFormat": "yaml",
 }

@@ -1,7 +1,15 @@
 [
-  "tests/bidaf_test.py::BidirectionalAttentionFlowTest::test_batch_predictions_are_consistent",
-  "tests/bidaf_test.py::BidirectionalAttentionFlowTest::test_forward_pass_runs_correctly",
-  "tests/bidaf_test.py::BidirectionalAttentionFlowTest::test_get_best_span",
-  "tests/bidaf_test.py::BidirectionalAttentionFlowTest::test_mismatching_dimensions_throws_configuration_error",
-  "tests/bidaf_test.py::BidirectionalAttentionFlowTest::test_model_can_train_save_and_load"
+  "tests/bidaf_v2_test.py::BidafV2SquadV1Test::test_batch_predictions_are_consistent",
+  "tests/bidaf_v2_test.py::BidafV2SquadV1Test::test_forward_pass_runs_correctly",
+  "tests/bidaf_v2_test.py::BidafV2SquadV1Test::test_get_best_span",
+  "tests/bidaf_v2_test.py::BidafV2SquadV1Test::test_mismatching_dimensions_throws_configuration_error",
+  "tests/bidaf_v2_test.py::BidafV2SquadV1Test::test_model_can_train_save_and_load",
+  "tests/bidaf_v2_test.py::BidafV2SquadV2Test::test_batch_predictions_are_consistent",
+  "tests/bidaf_v2_test.py::BidafV2SquadV2Test::test_forward_pass_runs_correctly",
+  "tests/bidaf_v2_test.py::BidafV2SquadV2Test::test_get_best_span",
+  "tests/bidaf_v2_test.py::BidafV2SquadV2Test::test_mismatching_dimensions_throws_configuration_error",
+  "tests/bidaf_v2_test.py::BidafV2SquadV2Test::test_model_can_train_save_and_load",
+  "tests/squad_v2_test.py::TestSquadReaderV2::()::test_read_from_file[True]",
+  "tests/squad_v2_test.py::TestSquadReaderV2::()::test_read_from_file[False]",
+  "tests/squad_v2_test.py::TestSquadReaderV2::()::test_can_build_from_params"
 ]

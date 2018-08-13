@@ -1,6 +1,6 @@
 {
   "dataset_reader": {
-    "type": "squad",
+    "type": "squad_v2",
     "token_indexers": {
       "tokens": {
         "type": "single_id",
@@ -14,49 +14,40 @@
       }
     }
   },
-  "train_data_path": "tests/fixtures/squad.json",
-  "validation_data_path": "tests/fixtures/squad.json",
+  "train_data_path": "tests/fixtures/squad-v2.0.json",
+  "validation_data_path": "tests/fixtures/squad-v2.0.json",
   "model": {
-    "type": "bidaf_self_attention",
+    "type": "bidaf_v2",
+    "metric": "squad_v2",
+    "no_answer": true,
     "text_field_embedder": {
-      "tokens": {
-        "type": "embedding",
-        "embedding_dim": 2,
-        "trainable": false
-      },
-      "token_characters": {
-        "type": "character_encoding",
-        "embedding": {
-          "num_embeddings": 260,
-          "embedding_dim": 8
+      "token_embedders": {
+        "tokens": {
+            "type": "embedding",
+            "embedding_dim": 2,
+            "trainable": false
         },
-        "encoder": {
-          "type": "cnn",
-          "embedding_dim": 8,
-          "num_filters": 8,
-          "ngram_filter_sizes": [5]
+        "token_characters": {
+            "type": "character_encoding",
+            "embedding": {
+            "num_embeddings": 260,
+            "embedding_dim": 8
+            },
+            "encoder": {
+            "type": "cnn",
+            "embedding_dim": 8,
+            "num_filters": 8,
+            "ngram_filter_sizes": [5]
+            }
         }
       }
     },
     "num_highway_layers": 1,
-    /*"phrase_layer": {
+    "phrase_layer": {
       "type": "lstm",
       "input_size": 10,
       "hidden_size": 10,
       "num_layers": 1
-    },*/
-    "phrase_layer": {
-      "type": "stacked_self_attention",
-      "input_dim": 10,
-      "hidden_dim": 10,
-      "projection_dim": 10,
-      "feedforward_hidden_dim": 10,
-      "num_layers": 2,
-      "num_attention_heads": 2,
-      "use_positional_encoding": true,
-      "dropout_prob": 0.1,
-      "residual_dropout_prob": 0.2,
-      "attention_dropout_prob": 0.1
     },
     "similarity_function": {
       "type": "linear",

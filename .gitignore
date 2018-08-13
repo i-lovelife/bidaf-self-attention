@@ -7,3 +7,6 @@ data/
 *.swp
 myenv/
 */.ipynb_checkpoints/
+**/.mypy_cache/
+**/.ipynb_checkpoints/
+**/.pytest_cache/

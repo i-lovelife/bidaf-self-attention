@@ -11,18 +11,18 @@ from allennlp.common.testing import ModelTestCase
 from allennlp.data import DatasetReader, Vocabulary
 from allennlp.data.dataset import Batch
 from allennlp.models import Model
+from allennlp.common.util import import_submodules
 
-import pathlib
-from source.models.bidaf_self_attention import BidafSelfAttention
+from src.common.file_root import FIXTURES_ROOT
+from src.models.bidaf_v2 import BidafV2
+import_submodules('src')
 
-class BidirectionalAttentionFlowTest(ModelTestCase):
+class BidafV2SquadV1Test(ModelTestCase):
     def setUp(self):
-        super(BidirectionalAttentionFlowTest, self).setUp()
+        super(BidafV2SquadV1Test, self).setUp()
 
-        self.TESTS_ROOT = (pathlib.Path(__file__).parent).resolve() 
-        self.FIXTURES_ROOT = self.TESTS_ROOT / 'fixtures'
-        self.set_up_model(self.FIXTURES_ROOT / 'experiment.json',
-                          self.FIXTURES_ROOT / 'squad.json')
+        self.set_up_model(FIXTURES_ROOT / 'experiment-v1.1.json',
+                          FIXTURES_ROOT / 'squad-v1.1.json')
 
     def test_forward_pass_runs_correctly(self):
         batch = Batch(self.instances)
@@ -74,12 +74,12 @@ class BidirectionalAttentionFlowTest(ModelTestCase):
         params = Params.from_file(self.param_file)
         reader = DatasetReader.from_params(params['dataset_reader'])
         reader._token_indexers = {'tokens': reader._token_indexers['tokens']}
-        self.instances = reader.read(self.FIXTURES_ROOT / 'squad.json')
+        self.instances = reader.read(params['train_data_path'])
         vocab = Vocabulary.from_instances(self.instances)
         for instance in self.instances:
             instance.index_fields(vocab)
-        del params['model']['text_field_embedder']['token_characters']
-        params['model']['phrase_layer']['input_dim'] = 2
+        del params['model']['text_field_embedder']['token_embedders']['token_characters']
+        params['model']['phrase_layer']['input_size'] = 2
         self.model = Model.from_params(vocab=vocab, params=params['model'])
 
         self.ensure_batch_predictions_are_consistent()
@@ -93,7 +93,7 @@ class BidirectionalAttentionFlowTest(ModelTestCase):
 
         span_begin_probs = torch.FloatTensor([[0.1, 0.3, 0.05, 0.3, 0.25]]).log()
         span_end_probs = torch.FloatTensor([[0.65, 0.05, 0.2, 0.05, 0.05]]).log()
-        begin_end_idxs = BidirectionalAttentionFlow.get_best_span(span_begin_probs, span_end_probs)
+        begin_end_idxs = BidafV2.get_best_span(span_begin_probs, span_end_probs)
         assert_almost_equal(begin_end_idxs.data.numpy(), [[0, 0]])
 
         # When we were using exclusive span ends, this was an edge case of the dynamic program.
@@ -101,32 +101,32 @@ class BidirectionalAttentionFlowTest(ModelTestCase):
         # span end.  The best answer is (1, 1).
         span_begin_probs = torch.FloatTensor([[0.4, 0.5, 0.1]]).log()
         span_end_probs = torch.FloatTensor([[0.3, 0.6, 0.1]]).log()
-        begin_end_idxs = BidirectionalAttentionFlow.get_best_span(span_begin_probs, span_end_probs)
+        begin_end_idxs = BidafV2.get_best_span(span_begin_probs, span_end_probs)
         assert_almost_equal(begin_end_idxs.data.numpy(), [[1, 1]])
 
         # Another instance that used to be an edge case.
         span_begin_probs = torch.FloatTensor([[0.8, 0.1, 0.1]]).log()
         span_end_probs = torch.FloatTensor([[0.8, 0.1, 0.1]]).log()
-        begin_end_idxs = BidirectionalAttentionFlow.get_best_span(span_begin_probs, span_end_probs)
+        begin_end_idxs = BidafV2.get_best_span(span_begin_probs, span_end_probs)
         assert_almost_equal(begin_end_idxs.data.numpy(), [[0, 0]])
 
         span_begin_probs = torch.FloatTensor([[0.1, 0.2, 0.05, 0.3, 0.25]]).log()
         span_end_probs = torch.FloatTensor([[0.1, 0.2, 0.5, 0.05, 0.15]]).log()
-        begin_end_idxs = BidirectionalAttentionFlow.get_best_span(span_begin_probs, span_end_probs)
+        begin_end_idxs = BidafV2.get_best_span(span_begin_probs, span_end_probs)
         assert_almost_equal(begin_end_idxs.data.numpy(), [[1, 2]])
 
     def test_mismatching_dimensions_throws_configuration_error(self):
         params = Params.from_file(self.param_file)
         # Make the phrase layer wrong - it should be 10 to match
         # the embedding + char cnn dimensions.
-        params["model"]["phrase_layer"]["input_dim"] = 12
+        params["model"]["phrase_layer"]["input_size"] = 12
         with pytest.raises(ConfigurationError):
             Model.from_params(vocab=self.vocab, params=params.pop("model"))
 
         params = Params.from_file(self.param_file)
         # Make the modeling layer input_dimension wrong - it should be 40 to match
         # 4 * output_dim of the phrase_layer.
-        params["model"]["phrase_layer"]["input_dim"] = 30
+        params["model"]["phrase_layer"]["input_size"] = 30
         with pytest.raises(ConfigurationError):
             Model.from_params(vocab=self.vocab, params=params.pop("model"))
 
@@ -136,3 +136,30 @@ class BidirectionalAttentionFlowTest(ModelTestCase):
         params["model"]["span_end_encoder"]["input_size"] = 50
         with pytest.raises(ConfigurationError):
             Model.from_params(vocab=self.vocab, params=params.pop("model"))
+
+class BidafV2SquadV2Test(BidafV2SquadV1Test):
+    def setUp(self):
+        ModelTestCase.setUp(self)
+
+        self.set_up_model(FIXTURES_ROOT / 'experiment-v2.0.json',
+                          FIXTURES_ROOT / 'squad-v2.0.json')
+
+    def test_get_best_span(self):
+        # pylint: disable=protected-access
+
+        span_begin_probs = torch.FloatTensor([[0.3, 0.05, 0.3, 0.25, 0.1]]).log()
+        span_end_probs = torch.FloatTensor([[0.05, 0.5, 0.15, 0.15, 0.15]]).log()
+        begin_end_idxs = BidafV2.get_best_span(span_begin_probs, span_end_probs, no_answer=True)
+        assert_almost_equal(begin_end_idxs.data.numpy(), [[0, 1]])
+
+        # Check no_answer is calculated separately
+        span_begin_probs = torch.FloatTensor([[0.1, 0.8, 0.1]]).log()
+        span_end_probs = torch.FloatTensor([[0.2, 0.1, 0.7]]).log()
+        begin_end_idxs = BidafV2.get_best_span(span_begin_probs, span_end_probs, no_answer=True)
+        assert_almost_equal(begin_end_idxs.data.numpy(), [[1, 1]])
+
+        # Check no_answer return -1,-1
+        span_begin_probs = torch.FloatTensor([[0.1, 0.1, 0.8]]).log()
+        span_end_probs = torch.FloatTensor([[0.2, 0.1, 0.7]]).log()
+        begin_end_idxs = BidafV2.get_best_span(span_begin_probs, span_end_probs, no_answer=True)
+        assert_almost_equal(begin_end_idxs.data.numpy(), [[-1, -1]])
