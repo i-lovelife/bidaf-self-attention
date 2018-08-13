@@ -73,9 +73,7 @@ class SquadMetricsV2(Metric):
                 "em": total_em,
                 "f1": total_f1,
                 "no_em": total_no_em,
-                "no_f1": total_no_f1,
-                "yes_em": total_yes_em,
-                "yes_f1": total_yes_f1
+                "yes_em": total_yes_em
         }
         if reset:
             self.reset()
