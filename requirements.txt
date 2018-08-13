@@ -1,5 +1,4 @@
 alabaster==0.7.11
-allennlp===0.5.2-unreleased
 astroid==1.6.5
 atomicwrites==1.1.5
 attrs==18.1.0
