@@ -209,7 +209,7 @@ class BidafV2(Model):
         # Add no answer padding.
         if self._no_answer:
             # Shape: (batch_size, passage_length + 1)
-            passage_eval_mask = torch.cat([passage_mask, torch.ones(batch_size, 1)], dim=-1)
+            passage_eval_mask = torch.cat([passage_mask, passage_mask.new_ones((batch_size, 1))], dim=-1)
             # Shape: (batch_size, 1)
             threshold = self._threshold.expand(batch_size, 1)
             # Shape: (batch_size, passage_length + 1)
