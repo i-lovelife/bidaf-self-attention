@@ -73,7 +73,7 @@ class BidafV2(Model):
         else:
             self._dropout = lambda x: x
         self._mask_lstms = mask_lstms
-        self._threshold = torch.tensor([[0.]], requires_grad=True)# pylint: disable=not-callable
+        self._threshold = torch.nn.Parameter(torch.zeros(1, 1))
         self._no_answer = no_answer
 
         initializer(self)
