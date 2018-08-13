@@ -35,7 +35,7 @@ class SquadMetricsV2(Metric):
             The golden span strings, may be several
         """
         no_answer = False
-        if not answer_strings:
+        if not answer_strings or not answer_strings[0]:
             answer_strings = ['']
             no_answer = True
         exact_match = max(evaluate_v2.compute_exact(answer, best_span_string) for answer in answer_strings)
