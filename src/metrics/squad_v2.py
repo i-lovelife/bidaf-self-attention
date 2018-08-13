@@ -66,9 +66,7 @@ class SquadMetricsV2(Metric):
         total_em = ave_score(self._total_em, self._count)
         total_f1 = ave_score(self._total_f1, self._count)
         total_no_em = ave_score(self._total_no_em, self._no_count)
-        total_no_f1 = ave_score(self._total_no_f1, self._no_count)
         total_yes_em = ave_score(self._total_yes_em, self._yes_count)
-        total_yes_f1 = ave_score(self._total_yes_f1, self._yes_count)
         ret = {
                 "em": total_em,
                 "f1": total_f1,
