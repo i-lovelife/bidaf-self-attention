@@ -31,7 +31,7 @@ class SquadMetricsV2(Metric):
         answer_strings : ``List[str]``
             The golden span strings, may be several
         """
-        self._count += 1 
+        self._count += 1
         if not answer_strings or not answer_strings[0]: # Negative
             answer_strings = ['']
             if not best_span_string:
@@ -46,6 +46,7 @@ class SquadMetricsV2(Metric):
 
     @overrides
     def get_metric(self, reset: bool = False) -> Dict[str, float]:
+        # pylint: disable=invalid-name,locally-disabled
         """
         Returns
         -------
