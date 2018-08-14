@@ -12,7 +12,7 @@ from allennlp.modules import (Highway, Seq2SeqEncoder, SimilarityFunction,
 from allennlp.modules.matrix_attention.legacy_matrix_attention import \
     LegacyMatrixAttention
 from allennlp.nn import InitializerApplicator, RegularizerApplicator, util
-from allennlp.training.metrics import BooleanAccuracy, CategoricalAccuracy
+from allennlp.training.metrics import BooleanAccuracy
 from allennlp.training.metrics.metric import Metric
 
 logger = logging.getLogger(__name__)  # pylint: disable=invalid-name
@@ -64,8 +64,6 @@ class BidafV2(Model):
         check_dimensions_match(span_end_encoder.get_input_dim(), 4 * encoding_dim + 3 * modeling_dim,
                                "span end encoder input dim", "4 * encoding dim + 3 * modeling dim")
 
-        self._span_start_accuracy = CategoricalAccuracy()
-        self._span_end_accuracy = CategoricalAccuracy()
         self._span_accuracy = BooleanAccuracy()
         self._squad_metrics = metric
         if dropout > 0:
@@ -232,6 +230,7 @@ class BidafV2(Model):
 
         # Compute the loss for training.
         if span_start is not None and span_end is not None:
+            self._span_accuracy(best_span, torch.stack([span_start, span_end], -1))
             # In case there is no answer, convert span_start and span_end from -1 to passage_length
             if self._no_answer:
                 span_start = torch.tensor(span_start)# pylint: disable=not-callable
@@ -242,10 +241,7 @@ class BidafV2(Model):
                         span_end[i][0] = passage_length
 
             loss = nll_loss(util.masked_log_softmax(span_start_logits, passage_eval_mask), span_start.squeeze(-1))
-            self._span_start_accuracy(span_start_logits, span_start.squeeze(-1))
             loss += nll_loss(util.masked_log_softmax(span_end_logits, passage_eval_mask), span_end.squeeze(-1))
-            self._span_end_accuracy(span_end_logits, span_end.squeeze(-1))
-            self._span_accuracy(best_span, torch.stack([span_start, span_end], -1))
             output_dict["loss"] = loss
 
 
@@ -275,8 +271,7 @@ class BidafV2(Model):
 
     def get_metrics(self, reset: bool = False) -> Dict[str, float]:
         """
-        Output metrics include em, f1, no_em, no_f1, yes_em, yes_f1,
-        start_acc, end_acc, span_acc
+        Output metrics include em, f1, no_em, span_acc
         """
         ret: Dict[str, Any] = {}
         if self._no_answer:
@@ -285,8 +280,6 @@ class BidafV2(Model):
             exact_match, f1_score = self._squad_metrics.get_metric(reset)
             ret['em'] = exact_match
             ret['f1'] = f1_score
-        ret['start_acc'] = self._span_start_accuracy.get_metric(reset)
-        ret['end_acc'] = self._span_end_accuracy.get_metric(reset)
         ret['span_acc'] = self._span_accuracy.get_metric(reset)
         return ret
 
