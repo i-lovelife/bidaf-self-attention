@@ -39,7 +39,7 @@ msgpack-numpy==0.4.3.1
 murmurhash==0.28.0
 mypy==0.521
 nltk==3.3
-numpy==1.15.0
+numpy==1.22.0
 numpydoc==0.8.0
 overrides==1.9
 packaging==17.1
