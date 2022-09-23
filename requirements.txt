@@ -46,7 +46,7 @@ packaging==17.1
 plac==0.9.6
 pluggy==0.7.1
 preshed==1.0.1
-protobuf==3.6.0
+protobuf==3.18.3
 py==1.5.4
 pyasn1==0.4.4
 pycparser==2.18
